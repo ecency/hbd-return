@@ -1,14 +1,15 @@
 const dhive = require('@hiveio/dhive');
 const axios = require('axios');
 
+const paccount = process.env.PACCOUNT || 'ecency';
+const pprivateKey = process.env.PKEY || '5xxx';
+
 const SERVERS = [
   'https://rpc.ecency.com',
   'https://api.hive.blog',
   'https://api.deathwing.me',
   'https://anyx.io',
 ];
-const paccount = process.env.PACCOUNT || 'keychain';
-const pprivateKey = process.env.PKEY || '5xxx';
 
 const client = new dhive.Client(SERVERS, {
   timeout: 4000,
@@ -78,20 +79,26 @@ const getHBDPrice = async () => {
 
 init = async() => {
   console.log('date', new Date().toISOString());
-  
+
+  // get account history of rewards 
   const rewards = await getHistory();
-  //console.log(rewards)
+
+  // sum rewards
   const sum_reward = summ(rewards, 'payment');
-  
   console.log('sum payment', sum_reward);
- 
+
+  // get HBD price
   const hbd_price = await getHBDPrice();
   console.log('hbd price', hbd_price);
+
+  // calculate difference
   let differ = 0;
   if (hbd_price && hbd_price.hive_dollar && hbd_price.hive_dollar.usd) {
     differ = sum_reward/hbd_price.hive_dollar.usd;  
   }
   console.log('difference', differ );
+
+  // send back difference above $1 to hbdstabilizer.
   let op = [];
   let operations = [];
   if (differ > 0.001) {
@@ -104,13 +111,13 @@ init = async() => {
         to: 'hbdstabilizer'
       }
     ]
+    operations.push(op);  
+    console.log('operations', operations);
+    
+    const privateKey = dhive.PrivateKey.fromString(pprivateKey);
+    const reso = await client.broadcast.sendOperations(operations, privateKey);
+    console.log('result', reso);
   }
-  operations.push(op);  
-  console.log('operations', operations);
-  
-  const privateKey = dhive.PrivateKey.fromString(pprivateKey);
-  const reso = await client.broadcast.sendOperations(operations, privateKey);
-  console.log('result', reso);
 }
 
 init().catch(console.error);
