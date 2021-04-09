@@ -1,0 +1,15 @@
+{
+  "name": "hbd-return",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hiveio/dhive": "^0.14.12",
+    "axios": "^0.21.1"
+  }
+}
