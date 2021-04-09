@@ -94,18 +94,18 @@ init = async() => {
   // calculate difference
   let differ = 0;
   if (hbd_price && hbd_price.hive_dollar && hbd_price.hive_dollar.usd) {
-    differ = sum_reward/hbd_price.hive_dollar.usd;  
+    differ = sum_reward/hbd_price.hive_dollar.usd;
   }
   console.log('difference', differ );
 
   // send back difference above $1 to hbdstabilizer.
   let op = [];
   let operations = [];
-  if (differ > 0.001) {
+  if (differ > 0.001 && differ < sum_reward) {
     op = [
-      "transfer", 
+      "transfer",
       { 
-        amount: `${(differ).toFixed(3)} HBD`,
+        amount: `${(sum_reward-differ).toFixed(3)} HBD`,
         from: paccount,
         memo: "Return HBD to stabilizer",
         to: 'hbdstabilizer'
