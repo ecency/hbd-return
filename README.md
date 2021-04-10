@@ -19,3 +19,5 @@ one liner
 ```
 yarn && PACCOUNT=ecency PKEY=5xxx PERIOD=3600000 node index.js
 ```
+
+Recommended to setup cron task with your selected `period`

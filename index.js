@@ -119,6 +119,7 @@ init = async() => {
     const reso = await client.broadcast.sendOperations(operations, privateKey);
     console.log('result', reso);
   }
+  process.exit();
 }
 
 init().catch(console.error);
