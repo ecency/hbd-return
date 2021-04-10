@@ -40,7 +40,6 @@ const getHistory = async () => {
     }
     const lelem1 = h1[0];
     first_id = lelem1[0];
-    //console.log(h1);
     history = [...h1];
     console.log('DHF reward history', history.length);
 
@@ -56,7 +55,7 @@ const getHistory = async () => {
         ops.push(op.op[1]);
       }
     }
-    console.log(ops);
+    //console.log(ops);
   }
   return ops;
 }
