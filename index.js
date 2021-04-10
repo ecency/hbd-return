@@ -3,6 +3,7 @@ const axios = require('axios');
 
 const paccount = process.env.PACCOUNT || 'ecency';
 const pprivateKey = process.env.PKEY || '5xxx';
+const period = process.env.PERIOD || '3600000'; // as in ms, 3600000 = 1h
 
 const SERVERS = [
   'https://rpc.ecency.com',
@@ -19,35 +20,44 @@ const client = new dhive.Client(SERVERS, {
 const ops = dhive.utils.operationOrders;
 const filters = dhive.utils.makeBitMaskFilter([ops.proposal_pay]);
 
-let first_id = -1;
-let history = [];
+const isPeriod = (someDate) => {
+  const now = new Date()
+  return ((new Date) - someDate) < period;
+}
 
 const getHistory = async () => {
-  const h1 = await client.call("condenser_api", "get_account_history", [paccount, first_id, 1000, ...filters]);
-  const lelem1 = h1[0];
-  first_id = lelem1[0];
-  const h2 = await client.call("condenser_api", "get_account_history", [paccount, first_id-1000, 1000, ...filters]);
-  const lelem2 = h2[0];
-  first_id = lelem2[0];
-  const h3 = await client.call("condenser_api", "get_account_history", [paccount, first_id-1000, 1000, ...filters]);
-  const lelem3 = h3[0];
-  first_id = lelem3[0];
-  history = [...h1, ...h2, ...h3];
-  
-  console.log('DHF reward history', history.length);
   let ops = [];
-  
-  for (let index = 0; index < history.length; index++) {
-    const element = history[index];
-    const op = element[1];
-    op.op[1].timestamp = `${op.timestamp}.000Z`;
-    op.op[1].block = op.block;
-    // take only today's rewards
-    if (isToday(new Date(op.op[1].timestamp))) {
-      ops.push(op.op[1]);
+  let first_id = 999;
+  let history = [];
+  let timestamp = new Date();
+
+  while (isPeriod(timestamp)) {
+    let h1;
+    try {
+      h1 = await client.call("condenser_api", "get_account_history", [paccount, first_id-1000, 1000, ...filters]);    
+    } catch (error) {
+      break;
     }
+    const lelem1 = h1[0];
+    first_id = lelem1[0];
+    //console.log(h1);
+    history = [...h1];
+    console.log('DHF reward history', history.length);
+
+    for (let index = history.length-1; index >= 0; index--) {
+      const element = history[index];
+      const op = element[1];
+      op.op[1].timestamp = `${op.timestamp}.000Z`;
+      op.op[1].block = op.block;
+      const ndate = new Date(`${op.timestamp}.000Z`)
+      timestamp = ndate;
+      // take only rewards within period
+      if (isPeriod(ndate)) {
+        ops.push(op.op[1]);
+      }
+    }
+    console.log(ops);
   }
-  //console.log(ops);
   return ops;
 }
 
@@ -56,13 +66,6 @@ const summ = (items, prop) => {
     return a + parseFloat(b[prop]);  
   }, 0);
 };
-
-const isToday = (someDate) => {
-  const today = new Date()
-  return (someDate.getUTCDate() == today.getUTCDate()) &&
-    someDate.getUTCMonth() == today.getUTCMonth() &&
-    someDate.getFullYear() == today.getFullYear()
-}
 
 const getHBDPrice = async () => {
   const requestConf = {
@@ -73,7 +76,6 @@ const getHBDPrice = async () => {
   const r = await axios(requestConf);
   return r.data;
 }
-
 
 // Init, main script
 
