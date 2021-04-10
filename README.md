@@ -21,3 +21,7 @@ yarn && PACCOUNT=ecency PKEY=5xxx PERIOD=3600000 node index.js
 ```
 
 Recommended to setup cron task with your selected `period`
+
+```
+0 * * * * PACCOUNT=ecency PKEY=5xxx /usr/bin/node $HOME/hbd-return/index.js > $HOME/hbd-return/`date +\%Y\%m\%d\%H\%M\%S`-cron.log
+```
