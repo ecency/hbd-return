@@ -108,7 +108,7 @@ init = async() => {
       { 
         amount: `${(sum_reward-differ).toFixed(3)} HBD`,
         from: paccount,
-        memo: "Return HBD to stabilizer",
+        memo: `Return HBD to stabilizer ~$${hbd_price.hive_dollar.usd}`,
         to: 'hbdstabilizer'
       }
     ]
