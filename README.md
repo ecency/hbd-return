@@ -13,3 +13,9 @@ export PKEY=5xxx
 export PERIOD=3600000
 node index.js
 ```
+
+one liner
+
+```
+yarn && PACCOUNT=ecency PKEY=5xxx PERIOD=3600000 node index.js
+```
