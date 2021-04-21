@@ -11,6 +11,7 @@ yarn
 export PACCOUNT=ecency
 export PKEY=5xxx
 export PERIOD=3600000
+export THRESHOLD=0.1
 node index.js
 ```
 
