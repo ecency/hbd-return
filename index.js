@@ -4,7 +4,7 @@ const axios = require('axios');
 const paccount = process.env.PACCOUNT || 'ecency';
 const pprivateKey = process.env.PKEY || '5xxx';
 const period = process.env.PERIOD || '3600000'; // as in ms, 3600000 = 1h
-const threshold = process.env.THRESHOLD || '0.15'; // as in percentage 1=100%, 15%
+const threshold = parseFloat(process.env.THRESHOLD || '0.15'); // as in percentage 1=100%, 15%
 
 const SERVERS = [
   'https://rpc.ecency.com',
@@ -106,7 +106,7 @@ init = async() => {
   let return_amount = (sum_reward-differ).toFixed(3);
   console.log('return amount', return_amount);
 
-  if (differ > 0.001 && differ < sum_reward && sum_reward*threshold < return_amount) {
+  if (differ > 0.001 && differ < sum_reward && differ*(1+threshold) < sum_reward) {
     op = [
       "transfer",
       { 
